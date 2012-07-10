@@ -1,4 +1,4 @@
-package com.stats.level;
+package com.storm;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
