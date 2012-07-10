@@ -1,4 +1,4 @@
-package com.statslevel;
+package com.stats.level;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
