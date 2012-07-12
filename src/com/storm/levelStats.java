@@ -15,7 +15,9 @@ public class levelStats extends JavaPlugin {
 
 	public static final Logger log = Logger.getLogger("Minecraft");
 /*	public HashMap<String,Double> Points = new HashMap<String,Double>();*/
-	public HashMap<String,Double> MH = new HashMap<String,Double>();
+	public HashMap<String,Double> playerMH = new HashMap<String,Double>();
+	public HashMap<String,Double> playerlvl = new HashMap<String,Double>();
+	public HashMap<String,Double> playerPoints = new HashMap<String,Double>();
 	/*public HashMap<String,Double> BD = new HashMap<String,Double>();*/
 	static String mainDirectory = "plugins/levelStats";
 	static Properties properties = new Properties(); 
@@ -28,8 +30,8 @@ public class levelStats extends JavaPlugin {
 			 File cfg = new File("plugins" + File.separator + "levelStats" + File.separator + "config.yml");
 				cfg.mkdir();
 	            Config = getConfig();
-	            Config.set("MaxHelthInc",1);
-	            Config.set("BaseDemageInc",1);
+	            Config.set("MaxHelthInc",1.0);
+	            Config.set("BaseDemageInc",1.0);
 		 }catch(Exception e1) {
          	System.out.println("error.");
          }
@@ -65,18 +67,56 @@ public class levelStats extends JavaPlugin {
 	
 	public void registerPlayer(Player p)
 	{
-		if(Config.contains(p.getName().toLowerCase()+".MaxHealtInc:"))
-		{
-			this.MH.put(p.getName().toLowerCase(), Config.getDouble("MaxHealthInc."+p.getName().toLowerCase()));
+		
+		//lvl
+		if(Config.contains(p.getName().toLowerCase()+".level")){
+			this.playerlvl.put(p.getName().toLowerCase(), (double) p.getLevel());
 		}
 		else
 		{
-			Config.set(p.getName().toLowerCase()+".MaxHealtInc:", 0.0);
-			this.MH.put(p.getName().toLowerCase(),0.0);
+			Config.set(p.getName().toLowerCase()+".level",(double) p.getLevel());
+			this.playerlvl.put(p.getName().toLowerCase(), (double) p.getLevel());
+			saveConfig();
+		}	
+			
+		//health
+		if(Config.contains(p.getName().toLowerCase()+".MaxHealthInc"))
+		{
+			this.playerMH.put(p.getName().toLowerCase(), Config.getDouble(p.getName().toLowerCase()+".MaxHealthInc"));
+		}
+		else
+		{
+			Config.set(p.getName().toLowerCase()+".MaxHealthInc", 0.0);
+			this.playerMH.put(p.getName().toLowerCase(),0.0);
 			saveConfig();
 		}
+		
+		//points
+		if(Config.contains(p.getName().toLowerCase()+".playerPoints")){
+			this.playerPoints.put(p.getName().toLowerCase(), Config.getDouble(p.getName().toLowerCase()+".playerPoints"));
+		}
+		else
+		{
+			Config.set(p.getName().toLowerCase()+".playerPoints", 0.0);
+			this.playerPoints.put(p.getName().toLowerCase(), 0.0);
+			saveConfig();
+		}	
+		
+		
+		
+		
 	}
 	
+	
+	
+	public void save(Player p)
+	{
+		Config.set(p.getName().toLowerCase()+".level",this.playerlvl.get(p.getName().toLowerCase()));
+		Config.set(p.getName().toLowerCase()+".MaxHealthInc",this.playerMH.get(p.getName().toLowerCase()));
+		Config.set(p.getName().toLowerCase()+".playerPoints",this.playerPoints.get(p.getName().toLowerCase()));
+		saveConfig();
+		
+	}
 	
 	
 	
