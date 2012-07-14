@@ -1,11 +1,16 @@
 package com.storm;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Effect;
+import org.bukkit.Location;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -115,6 +120,70 @@ public class levelStatsListeners implements Listener {
 		}	
 		
 	}
+	
+	
+	
+	@EventHandler(priority=EventPriority.HIGHEST)
+	public void onEDamageByE(EntityDamageByEntityEvent event) {
+		//if (event.getEntity() instanceof Player) {
+		/*	Player Damagee = (Player) event.getEntity();
+			String damager = event.getDamager().toString();
+			Damagee.
+			Bukkit.broadcastMessage("entity "+ Damagee);
+			Bukkit.broadcastMessage("damager "+ damager);*/
+
+		if (event.getDamager() instanceof Player){
+			Player p = (Player) event.getDamager();
+			int dmg = event.getDamage();
+			double cRate = plugin.critRate.get(p.getName().toLowerCase());
+			double random = ((double) Math.random() * 100);
+			
+			if (cRate > 0){
+				if (random <= cRate){
+					int oldmg = event.getDamage();
+					int newdmg = oldmg*2;
+					event.setDamage(newdmg);
+					p.sendMessage(ChatColor.AQUA + "Critical!");
+					Location loc = p.getLocation();
+					p.playEffect(loc, Effect.BLAZE_SHOOT, 0);
+				}
+				
+			}
+
+		
+		}
+		
+		
+		
+		/*
+		Player p = (Player) event.getDamager();
+		String player = p.getName();
+		Bukkit.broadcastMessage("name "+ player);*/
+		
+		//}
+		
+	}
+	
+	
+	
+	@EventHandler(priority=EventPriority.HIGHEST)
+	public void onEDamaged(EntityDamageEvent event) {
+		if (event.getEntity() instanceof Player){
+			Player p = (Player) event.getEntity();
+			p.sendMessage("Au!");
+			
+		}
+		
+		
+	}
+	
+	
+	/*@EventHandler
+	public void onEntityDamage(EntityDamageEvent event) {
+		Player Damagee = (Player) event.getEntity();
+		Bukkit.broadcastMessage("entity "+ Damagee);
+		
+	}*/
 	
 	
 	

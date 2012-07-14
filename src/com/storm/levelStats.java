@@ -18,6 +18,7 @@ public class levelStats extends JavaPlugin {
 	public HashMap<String,Double> playerMH = new HashMap<String,Double>();
 	public HashMap<String,Double> playerlvl = new HashMap<String,Double>();
 	public HashMap<String,Double> playerPoints = new HashMap<String,Double>();
+	public HashMap<String,Double> critRate = new HashMap<String,Double>();
 	/*public HashMap<String,Double> BD = new HashMap<String,Double>();*/
 	static String mainDirectory = "plugins/levelStats";
 	static Properties properties = new Properties(); 
@@ -101,7 +102,16 @@ public class levelStats extends JavaPlugin {
 			this.playerPoints.put(p.getName().toLowerCase(), 0.0);
 			saveConfig();
 		}	
-		
+		//CRate
+		if(Config.contains(p.getName().toLowerCase()+".CriticalRate")){
+			this.critRate.put(p.getName().toLowerCase(), Config.getDouble(p.getName().toLowerCase()+".CriticalRate"));
+		}
+		else
+		{
+			Config.set(p.getName().toLowerCase()+".CriticalRate", 0.0);
+			this.critRate.put(p.getName().toLowerCase(), 0.0);
+			saveConfig();
+		}	
 		
 		
 		
