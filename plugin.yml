@@ -2,4 +2,10 @@ name: levelStats
 main: com.storm.levelStats
 version: 1
 
-      
+commands:
+    lvls:
+        description: test
+        usage: /<command>
+    levelstats:
+        description: test
+        usage: /<command>

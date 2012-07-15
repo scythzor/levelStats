@@ -1,6 +1,6 @@
 package com.storm;
 
-import org.bukkit.Bukkit;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -11,19 +11,18 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLevelChangeEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class levelStatsListeners implements Listener {
 	
 	levelStats plugin;
 	public levelStatsListeners(levelStats instance){
-		plugin=instance;
+		this.plugin=instance;
 	}
 	@EventHandler 
 	public void onPlayerJoin(PlayerJoinEvent event)
@@ -96,6 +95,9 @@ public class levelStatsListeners implements Listener {
 						p.setLevel(level);
 						plugin.playerlvl.put(p.getName().toLowerCase(),(double) level);
 						plugin.save(p);
+						//recuperar HP
+						plugin.registerPlayer(p);
+						
 						p.sendMessage("Has muerto, pero conservarás tus stats y nivel :) ");
 						}else{
 							plugin.playerlvl.put(p.getName().toLowerCase(),0.0);
@@ -123,7 +125,7 @@ public class levelStatsListeners implements Listener {
 	
 	
 	
-	@EventHandler(priority=EventPriority.HIGHEST)
+	@EventHandler(priority=EventPriority.HIGH)
 	public void onEDamageByE(EntityDamageByEntityEvent event) {
 		//if (event.getEntity() instanceof Player) {
 		/*	Player Damagee = (Player) event.getEntity();
@@ -134,7 +136,7 @@ public class levelStatsListeners implements Listener {
 
 		if (event.getDamager() instanceof Player){
 			Player p = (Player) event.getDamager();
-			int dmg = event.getDamage();
+			//int dmg = event.getDamage();
 			double cRate = plugin.critRate.get(p.getName().toLowerCase());
 			double random = ((double) Math.random() * 100);
 			
@@ -166,16 +168,94 @@ public class levelStatsListeners implements Listener {
 	
 	
 	
-	@EventHandler(priority=EventPriority.HIGHEST)
+	@EventHandler(priority=EventPriority.NORMAL)
 	public void onEDamaged(EntityDamageEvent event) {
+		
 		if (event.getEntity() instanceof Player){
+			DamageCause cause=event.getCause();
+			if(cause!=DamageCause.LAVA && cause!=DamageCause.FIRE){
 			Player p = (Player) event.getEntity();
-			p.sendMessage("Au!");
+			//p.sendMessage("Au!");
+			//formula daño equivalente
+			int evdmg = event.getDamage();
+			double resHP= event.getDamage();
+			double tempop=0;
+			event.setDamage(0);
+			double CH = plugin.PCH.get(p.getName().toLowerCase());
+			double MH = plugin.PMH.get(p.getName().toLowerCase());
+			CH=CH-evdmg;
+			tempop=MH/20;
+			resHP= CH/tempop;
+			p.setHealth((int) resHP);
+			plugin.PCH.put(p.getName().toLowerCase(), CH);
+			p.sendMessage("HP: "+ChatColor.AQUA+CH+ChatColor.GRAY+"/"+ChatColor.DARK_AQUA+MH);
+		
+		}else{
+			Player p = (Player) event.getEntity();
+			double HP = p.getHealth();
+			double CH = plugin.PCH.get(p.getName().toLowerCase());
+			double MH = plugin.PMH.get(p.getName().toLowerCase());
+			double tempop=0;
+			tempop=MH/20;
+			CH=HP*tempop;
+			plugin.PCH.put(p.getName().toLowerCase(), CH);
+		}
+			
 			
 		}
 		
-		
 	}
+	
+	
+	
+
+	/*@EventHandler(priority=EventPriority.NORMAL)
+	public void onCombust(EntityCombustEvent event){
+		Bukkit.broadcastMessage("event");
+		
+	}*/
+	
+	
+	
+	
+	
+	
+	@EventHandler(priority=EventPriority.NORMAL)
+	public void onRegainH(EntityRegainHealthEvent event){
+		Player p = (Player) event.getEntity();
+		int regain = event.getAmount();
+		//regen HP
+		double CH = plugin.PCH.get(p.getName().toLowerCase());
+		double MH = plugin.PMH.get(p.getName().toLowerCase());
+		double tempop=0;
+		double resHP= 0;
+		CH=CH+regain;
+		tempop=MH/20;
+		resHP= CH/tempop;
+		//event.setDamage((int) resdmg);
+		p.setHealth((int) resHP);
+		plugin.PCH.put(p.getName().toLowerCase(), CH);
+		
+		
+		//Bukkit.broadcastMessage("regain "+ p);
+		//event.
+		//añadir sistema de max health nuevo
+	}
+	
+	
+	
+	//parchear en evento de daño
+/*	@EventHandler(priority=EventPriority.NORMAL)
+	public void onFood(FoodLevelChangeEvent event) {
+		String temp = event.getEntityType().getName();
+	//	int temp = event.getFoodLevel();
+
+		Bukkit.broadcastMessage("event "+ temp);
+		
+	}*/
+
+	
+	
 	
 	
 	/*@EventHandler
